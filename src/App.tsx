@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
+import Footer from './components/Footer';
 import ParticleBackground from './components/ParticleBackground';
 import CursorTrail from './components/CursorTrail';
 import AIMascot from './components/AIMascot';
@@ -26,6 +27,7 @@ function App() {
           <Route path="/contact" element={<ContactPage />} />
         </Routes>
         
+        <Footer />
         <AIMascot />
       </div>
     </Router>

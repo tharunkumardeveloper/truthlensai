@@ -202,24 +202,6 @@ const AboutPage: React.FC = () => {
               </motion.div>
             ))}
             </div>
-            
-            {/* Student Project Footer */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-              viewport={{ once: true }}
-              className="mt-12 pt-8 border-t border-white/10 text-center"
-            >
-              <div className="bg-gradient-to-r from-purple-500/10 to-cyan-500/10 rounded-2xl p-6">
-                <h4 className="text-lg font-bold text-white mb-2">Student Project</h4>
-                <p className="text-gray-300 text-sm">
-                  This is a student project created by <span className="text-purple-400 font-semibold">Tharun Kumar C</span>, 
-                  <span className="text-cyan-400 font-semibold"> Dharani K</span>, and 
-                  <span className="text-pink-400 font-semibold"> Thanushrie Sathishkumar</span>
-                </p>
-              </div>
-            </motion.div>
           </div>
         </motion.div>
 

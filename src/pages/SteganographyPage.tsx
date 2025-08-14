@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Upload, Search, Download, AlertTriangle, CheckCircle, Shield, FileText, Trash2 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import jsPDF from 'jspdf';
 
 interface StegoResult {
   hasHiddenData: boolean;
@@ -101,108 +102,135 @@ const SteganographyPage: React.FC = () => {
   const generateSteganographyReport = () => {
     if (!stegoResult) return;
 
-    const reportContent = `
-TRUTHLENS AI - STEGANOGRAPHY ANALYSIS REPORT
-============================================
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.width;
+    const margin = 20;
+    let yPosition = 30;
 
-Analysis Date: ${new Date().toLocaleString()}
-Image File: ${imageFile?.name || 'Demo Image'}
+    // Header
+    doc.setFontSize(20);
+    doc.setFont('helvetica', 'bold');
+    doc.text('TRUTHLENS AI', pageWidth / 2, yPosition, { align: 'center' });
+    yPosition += 10;
+    
+    doc.setFontSize(16);
+    doc.text('STEGANOGRAPHY ANALYSIS REPORT', pageWidth / 2, yPosition, { align: 'center' });
+    yPosition += 20;
 
-DETECTION RESULTS
------------------
-Status: ${stegoResult.hasHiddenData ? 'HIDDEN DATA DETECTED' : 'NO HIDDEN DATA FOUND'}
-Confidence Level: ${stegoResult.confidence}%
-Data Type: ${stegoResult.dataType}
-Risk Assessment: ${stegoResult.confidence > 80 ? 'HIGH CONFIDENCE' : stegoResult.confidence > 60 ? 'MODERATE CONFIDENCE' : 'LOW CONFIDENCE'}
+    // Analysis Info
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Analysis Date: ${new Date().toLocaleString()}`, margin, yPosition);
+    yPosition += 8;
+    doc.text(`Image File: ${imageFile?.name || 'Demo Image'}`, margin, yPosition);
+    yPosition += 15;
 
-${stegoResult.extractedText ? `
-EXTRACTED CONTENT
------------------
-Hidden Message: "${stegoResult.extractedText}"
-Content Length: ${stegoResult.extractedText.length} characters
-Encoding Method: LSB (Least Significant Bit)
-` : ''}
+    // Detection Results
+    doc.setFont('helvetica', 'bold');
+    doc.text('DETECTION RESULTS', margin, yPosition);
+    yPosition += 10;
+    
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Status: ${stegoResult.hasHiddenData ? 'HIDDEN DATA DETECTED' : 'NO HIDDEN DATA FOUND'}`, margin, yPosition);
+    yPosition += 8;
+    doc.text(`Confidence Level: ${stegoResult.confidence}%`, margin, yPosition);
+    yPosition += 8;
+    doc.text(`Data Type: ${stegoResult.dataType}`, margin, yPosition);
+    yPosition += 15;
 
-TECHNICAL ANALYSIS
-------------------
-Analysis Method: Multi-layer steganographic detection
-Pixel Patterns: ${stegoResult.hasHiddenData ? 'Anomalies detected' : 'Normal distribution'}
-LSB Variations: ${stegoResult.hasHiddenData ? 'Irregular patterns found' : 'Standard variations'}
-Frequency Analysis: ${stegoResult.hasHiddenData ? 'Suspicious frequencies detected' : 'Normal frequency distribution'}
-Statistical Tests: ${stegoResult.hasHiddenData ? 'Failed chi-square test' : 'Passed statistical tests'}
+    // Extracted Content
+    if (stegoResult.extractedText) {
+      doc.setFont('helvetica', 'bold');
+      doc.text('EXTRACTED CONTENT', margin, yPosition);
+      yPosition += 10;
+      
+      doc.setFont('helvetica', 'normal');
+      doc.text(`Hidden Message: "${stegoResult.extractedText}"`, margin, yPosition);
+      yPosition += 8;
+      doc.text(`Content Length: ${stegoResult.extractedText.length} characters`, margin, yPosition);
+      yPosition += 15;
+    }
 
-DETECTION METHODOLOGY
----------------------
-• Least Significant Bit (LSB) Analysis: Examined pixel LSBs for hidden data patterns
-• Statistical Analysis: Applied chi-square and other statistical tests
-• Frequency Domain Analysis: Analyzed DCT coefficients for irregularities
-• Spatial Domain Inspection: Checked for pixel manipulation artifacts
-• Histogram Analysis: Examined color distribution patterns
+    // Technical Analysis
+    doc.setFont('helvetica', 'bold');
+    doc.text('TECHNICAL ANALYSIS', margin, yPosition);
+    yPosition += 10;
+    
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Analysis Method: Multi-layer steganographic detection`, margin, yPosition);
+    yPosition += 8;
+    doc.text(`Pixel Patterns: ${stegoResult.hasHiddenData ? 'Anomalies detected' : 'Normal distribution'}`, margin, yPosition);
+    yPosition += 8;
+    doc.text(`LSB Variations: ${stegoResult.hasHiddenData ? 'Irregular patterns found' : 'Standard variations'}`, margin, yPosition);
+    yPosition += 15;
 
-${stegoResult.hasHiddenData ? `
-STEGANOGRAPHY INDICATORS
-------------------------
-• Irregular LSB patterns detected
-• Statistical anomalies in pixel distribution
-• Suspicious frequency domain characteristics
-• Non-random data patterns found
-• Hidden regions identified: ${stegoResult.hiddenRegions.length} areas
+    // Detection Methodology
+    doc.setFont('helvetica', 'bold');
+    doc.text('DETECTION METHODOLOGY', margin, yPosition);
+    yPosition += 10;
+    
+    doc.setFont('helvetica', 'normal');
+    const methodology = [
+      '• LSB Analysis: Examined pixel LSBs for hidden data patterns',
+      '• Statistical Analysis: Applied chi-square and other statistical tests',
+      '• Frequency Domain Analysis: Analyzed DCT coefficients',
+      '• Spatial Domain Inspection: Checked for pixel manipulation artifacts'
+    ];
+    
+    methodology.forEach(item => {
+      doc.text(item, margin, yPosition);
+      yPosition += 8;
+    });
+    yPosition += 10;
 
-SECURITY IMPLICATIONS
----------------------
-• This image contains hidden information
-• Data may have been embedded intentionally
-• Consider the source and context of this image
-• Extracted content should be analyzed for potential threats
-• Recommend further investigation of image origin
-` : `
-AUTHENTICITY INDICATORS
------------------------
-• No hidden data patterns detected
-• Normal statistical distribution of pixels
-• Standard compression characteristics
-• No LSB manipulation artifacts found
-• Clean frequency domain analysis
+    // Results-specific content
+    if (stegoResult.hasHiddenData) {
+      doc.setFont('helvetica', 'bold');
+      doc.text('STEGANOGRAPHY INDICATORS', margin, yPosition);
+      yPosition += 10;
+      
+      doc.setFont('helvetica', 'normal');
+      const indicators = [
+        '• Irregular LSB patterns detected',
+        '• Statistical anomalies in pixel distribution',
+        '• Suspicious frequency domain characteristics',
+        `• Hidden regions identified: ${stegoResult.hiddenRegions.length} areas`
+      ];
+      
+      indicators.forEach(item => {
+        doc.text(item, margin, yPosition);
+        yPosition += 8;
+      });
+    } else {
+      doc.setFont('helvetica', 'bold');
+      doc.text('AUTHENTICITY INDICATORS', margin, yPosition);
+      yPosition += 10;
+      
+      doc.setFont('helvetica', 'normal');
+      const indicators = [
+        '• No hidden data patterns detected',
+        '• Normal statistical distribution of pixels',
+        '• Standard compression characteristics',
+        '• No LSB manipulation artifacts found'
+      ];
+      
+      indicators.forEach(item => {
+        doc.text(item, margin, yPosition);
+        yPosition += 8;
+      });
+    }
+    
+    yPosition += 15;
 
-VERIFICATION STATUS
--------------------
-• Image appears to contain no hidden data
-• Standard image compression patterns
-• Normal pixel distribution characteristics
-• No steganographic indicators found
-`}
+    // Footer
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'italic');
+    doc.text('Generated by TruthLens AI v2.1.0', margin, yPosition);
+    yPosition += 6;
+    doc.text(`Report ID: ${Math.random().toString(36).substr(2, 9).toUpperCase()}`, margin, yPosition);
 
-ANALYSIS PARAMETERS
--------------------
-Image Dimensions: ${Math.floor(Math.random() * 1000) + 500}x${Math.floor(Math.random() * 800) + 400} pixels
-Color Depth: 24-bit RGB
-File Format: ${imageFile?.type || 'image/jpeg'}
-Compression: ${Math.floor(Math.random() * 30) + 70}% quality
-Analysis Duration: ${Math.floor(Math.random() * 8) + 3} seconds
-
-DISCLAIMER
-----------
-This analysis is provided by TruthLens AI steganography detection system. While our
-algorithms are highly sophisticated, steganography detection is inherently challenging
-and results should be interpreted within the broader context of digital forensics.
-For critical applications, consider multiple analysis tools and expert review.
-
-Report ID: ${Math.random().toString(36).substr(2, 9).toUpperCase()}
-Generated by: TruthLens AI v2.1.0
-
-For questions or support, contact: support@truthlensai.com
-    `.trim();
-
-    // Create and download the report
-    const blob = new Blob([reportContent], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `TruthLens_Steganography_Report_${new Date().toISOString().split('T')[0]}.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    // Save the PDF
+    doc.save(`TruthLens_Steganography_Report_${new Date().toISOString().split('T')[0]}.pdf`);
   };
 
   const clearFile = () => {
@@ -216,11 +244,14 @@ For questions or support, contact: support@truthlensai.com
   };
 
   const tryDemo = () => {
-    clearFile();
+    // Clear previous results but keep the demo setup
+    setStegoResult(null);
+    setProgress(0);
+    
+    // Set up demo image
     const demoImage = '/Steganography.png';
-    setImageFile(new File([], 'demo-steganography-image.png', { type: 'image/png' }));
+    setImageFile(new File(['demo'], 'demo-steganography-image.png', { type: 'image/png' }));
     setImagePreview(demoImage);
-    // Don't auto-start analysis for demo
   };
 
   return (
@@ -439,13 +470,7 @@ For questions or support, contact: support@truthlensai.com
 
                     <button className="w-full px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-xl font-semibold hover:shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-2">
                       <Download className="w-5 h-5" />
-                      <span>Download Analysis Report</span>
-                    </button>
-                    <button 
                       onClick={generateSteganographyReport}
-                      className="w-full px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-xl font-semibold hover:shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-2"
-                    >
-                      <Download className="w-5 h-5" />
                       <span>Download Analysis Report</span>
                     </button>
                   </div>

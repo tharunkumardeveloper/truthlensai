@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Upload, Play, Download, AlertTriangle, CheckCircle, Eye, BarChart3, X, Trash2 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import jsPDF from 'jspdf';
 
 interface AnalysisResult {
   confidence: number;
@@ -89,92 +90,128 @@ const DeepfakeDetectionPage: React.FC = () => {
     
     return frames;
   };
-  const simulateProcessing = async () => {
+
   const generatePDFReport = () => {
     if (!analysisResult) return;
 
-    const reportContent = `
-TRUTHLENS AI - DEEPFAKE DETECTION REPORT
-========================================
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.width;
+    const margin = 20;
+    let yPosition = 30;
 
-Analysis Date: ${new Date().toLocaleString()}
-Video File: ${videoFile?.name || 'Demo Video'}
+    // Header
+    doc.setFontSize(20);
+    doc.setFont('helvetica', 'bold');
+    doc.text('TRUTHLENS AI', pageWidth / 2, yPosition, { align: 'center' });
+    yPosition += 10;
+    
+    doc.setFontSize(16);
+    doc.text('DEEPFAKE DETECTION REPORT', pageWidth / 2, yPosition, { align: 'center' });
+    yPosition += 20;
 
-DETECTION RESULTS
------------------
-Status: ${analysisResult.isDeepfake ? 'DEEPFAKE DETECTED' : 'AUTHENTIC CONTENT'}
-Confidence Level: ${analysisResult.confidence}%
-Risk Assessment: ${analysisResult.confidence > 80 ? 'HIGH CONFIDENCE' : analysisResult.confidence > 60 ? 'MODERATE CONFIDENCE' : 'LOW CONFIDENCE'}
+    // Analysis Info
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Analysis Date: ${new Date().toLocaleString()}`, margin, yPosition);
+    yPosition += 8;
+    doc.text(`Video File: ${videoFile?.name || 'Demo Video'}`, margin, yPosition);
+    yPosition += 15;
 
-TECHNICAL DETAILS
------------------
-Total Frames Analyzed: ${analysisResult.frameCount}
-Processed Frames: ${analysisResult.processedFrames}
-Faces Detected: ${analysisResult.detectedFaces}
-Processing Time: ${Math.floor(Math.random() * 25) + 15} seconds
+    // Detection Results
+    doc.setFont('helvetica', 'bold');
+    doc.text('DETECTION RESULTS', margin, yPosition);
+    yPosition += 10;
+    
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Status: ${analysisResult.isDeepfake ? 'DEEPFAKE DETECTED' : 'AUTHENTIC CONTENT'}`, margin, yPosition);
+    yPosition += 8;
+    doc.text(`Confidence Level: ${analysisResult.confidence}%`, margin, yPosition);
+    yPosition += 8;
+    doc.text(`Risk Assessment: ${analysisResult.confidence > 80 ? 'HIGH CONFIDENCE' : analysisResult.confidence > 60 ? 'MODERATE CONFIDENCE' : 'LOW CONFIDENCE'}`, margin, yPosition);
+    yPosition += 15;
 
-ANALYSIS METHODOLOGY
---------------------
-• Facial Landmark Detection: Advanced neural networks analyzed facial features and movements
-• Temporal Consistency: Frame-by-frame analysis for temporal artifacts and inconsistencies
-• Pixel-level Analysis: Deep learning models examined pixel patterns and compression artifacts
-• Biometric Verification: Cross-referenced facial biometrics across multiple frames
+    // Technical Details
+    doc.setFont('helvetica', 'bold');
+    doc.text('TECHNICAL DETAILS', margin, yPosition);
+    yPosition += 10;
+    
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Total Frames Analyzed: ${analysisResult.frameCount}`, margin, yPosition);
+    yPosition += 8;
+    doc.text(`Processed Frames: ${analysisResult.processedFrames}`, margin, yPosition);
+    yPosition += 8;
+    doc.text(`Faces Detected: ${analysisResult.detectedFaces}`, margin, yPosition);
+    yPosition += 8;
+    doc.text(`Processing Time: ${Math.floor(Math.random() * 25) + 15} seconds`, margin, yPosition);
+    yPosition += 15;
 
-${analysisResult.isDeepfake ? `
-DEEPFAKE INDICATORS FOUND
--------------------------
-• Inconsistent facial landmarks detected
-• Temporal artifacts in eye movement patterns
-• Unnatural skin texture variations
-• Compression artifacts suggesting manipulation
-• Facial boundary inconsistencies
+    // Analysis Methodology
+    doc.setFont('helvetica', 'bold');
+    doc.text('ANALYSIS METHODOLOGY', margin, yPosition);
+    yPosition += 10;
+    
+    doc.setFont('helvetica', 'normal');
+    const methodology = [
+      '• Facial Landmark Detection: Advanced neural networks analyzed facial features',
+      '• Temporal Consistency: Frame-by-frame analysis for temporal artifacts',
+      '• Pixel-level Analysis: Deep learning models examined pixel patterns',
+      '• Biometric Verification: Cross-referenced facial biometrics across frames'
+    ];
+    
+    methodology.forEach(item => {
+      doc.text(item, margin, yPosition);
+      yPosition += 8;
+    });
+    yPosition += 10;
 
-RECOMMENDATIONS
----------------
-• This content should be treated as potentially manipulated
-• Verify source authenticity through alternative channels
-• Consider additional verification methods
-• Report suspicious content to relevant authorities if necessary
-` : `
-AUTHENTICITY INDICATORS
------------------------
-• Consistent facial landmarks throughout video
-• Natural temporal flow and movement patterns
-• Uniform compression characteristics
-• No detected manipulation artifacts
-• Biometric consistency maintained
+    // Results-specific content
+    if (analysisResult.isDeepfake) {
+      doc.setFont('helvetica', 'bold');
+      doc.text('DEEPFAKE INDICATORS FOUND', margin, yPosition);
+      yPosition += 10;
+      
+      doc.setFont('helvetica', 'normal');
+      const indicators = [
+        '• Inconsistent facial landmarks detected',
+        '• Temporal artifacts in eye movement patterns',
+        '• Unnatural skin texture variations',
+        '• Compression artifacts suggesting manipulation'
+      ];
+      
+      indicators.forEach(item => {
+        doc.text(item, margin, yPosition);
+        yPosition += 8;
+      });
+    } else {
+      doc.setFont('helvetica', 'bold');
+      doc.text('AUTHENTICITY INDICATORS', margin, yPosition);
+      yPosition += 10;
+      
+      doc.setFont('helvetica', 'normal');
+      const indicators = [
+        '• Consistent facial landmarks throughout video',
+        '• Natural temporal flow and movement patterns',
+        '• Uniform compression characteristics',
+        '• No detected manipulation artifacts'
+      ];
+      
+      indicators.forEach(item => {
+        doc.text(item, margin, yPosition);
+        yPosition += 8;
+      });
+    }
+    
+    yPosition += 15;
 
-VERIFICATION STATUS
--------------------
-• Content appears to be authentic
-• No significant manipulation indicators found
-• Standard video compression patterns detected
-• Natural facial expressions and movements observed
-`}
+    // Footer
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'italic');
+    doc.text('Generated by TruthLens AI v2.1.0', margin, yPosition);
+    yPosition += 6;
+    doc.text(`Report ID: ${Math.random().toString(36).substr(2, 9).toUpperCase()}`, margin, yPosition);
 
-DISCLAIMER
-----------
-This analysis is provided by TruthLens AI deepfake detection system. While our AI models
-achieve high accuracy rates, no detection system is 100% perfect. This report should be
-used as part of a comprehensive verification process. For critical applications, consider
-multiple verification methods and expert human review.
-
-Report ID: ${Math.random().toString(36).substr(2, 9).toUpperCase()}
-Generated by: TruthLens AI v2.1.0
-
-For questions or support, contact: support@truthlensai.com
-    `.trim();
-
-    // Create and download the report
-    const blob = new Blob([reportContent], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `TruthLens_Deepfake_Report_${new Date().toISOString().split('T')[0]}.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    // Save the PDF
+    doc.save(`TruthLens_Deepfake_Report_${new Date().toISOString().split('T')[0]}.pdf`);
   };
 
   const clearFile = () => {
@@ -188,6 +225,7 @@ For questions or support, contact: support@truthlensai.com
     }
   };
 
+  const simulateProcessing = async () => {
     setIsProcessing(true);
     setProgress(0);
     setExtractedFrames([]);
@@ -233,10 +271,15 @@ For questions or support, contact: support@truthlensai.com
   };
 
   const tryDemo = () => {
-    clearFile();
-    setVideoUrl('/4883894-hd_1080_1920_24fps.mp4');
-    setVideoFile(new File([], 'demo-deepfake-video.mp4', { type: 'video/mp4' }));
-    // Don't auto-start processing for demo
+    // Clear previous results but keep the demo setup
+    setAnalysisResult(null);
+    setExtractedFrames([]);
+    setProgress(0);
+    
+    // Set up demo video
+    const demoVideoUrl = '/4883894-hd_1080_1920_24fps.mp4';
+    setVideoUrl(demoVideoUrl);
+    setVideoFile(new File(['demo'], 'demo-deepfake-video.mp4', { type: 'video/mp4' }));
   };
 
   return (
@@ -331,9 +374,9 @@ For questions or support, contact: support@truthlensai.com
               <div className="mt-6 flex justify-center">
                 <button
                   onClick={tryDemo}
-                  className="px-6 py-3 bg-white/10 backdrop-blur-md rounded-xl border border-white/20 hover:bg-white/20 transition-all duration-300 text-sm"
+                  className="px-6 py-3 bg-gradient-to-r from-orange-500/20 to-red-500/20 border border-orange-500/30 text-orange-400 rounded-xl font-semibold hover:bg-orange-500/30 hover:scale-105 transition-all duration-300 text-sm"
                 >
-                  Try Demo Video
+                  🎬 Try Demo Video (Deepfake)
                 </button>
               </div>
 
@@ -476,14 +519,7 @@ For questions or support, contact: support@truthlensai.com
                     </div>
                   </div>
 
-                  <button className="w-full px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-xl font-semibold hover:shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-2">
-                    <Download className="w-5 h-5" />
-                    🎬 Try Demo Video (Deepfake)
-                  </button>
-                  <button 
-                    onClick={generatePDFReport}
-                    className="w-full px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-xl font-semibold hover:shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-2"
-                  >
+                  <button onClick={generatePDFReport} className="w-full px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-xl font-semibold hover:shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-2">
                     <Download className="w-5 h-5" />
                     <span>Download Report</span>
                   </button>

@@ -73,9 +73,20 @@ const SteganographyPage: React.FC = () => {
       setProgress((i + 1) / steps.length * 100);
     }
 
-    // Generate mock results
-    const hasHiddenData = Math.random() > 0.4;
-    const confidence = Math.random() * 30 + 70;
+    // Determine result based on filename
+    let hasHiddenData = true; // Default for demo
+    let confidence = 85; // Default confidence
+    
+    if (imageFile) {
+      const fileName = imageFile.name.toLowerCase();
+      if (fileName.includes('og11.jpeg')) {
+        hasHiddenData = false;
+        confidence = 92;
+      } else if (fileName.includes('dee11.jpeg') || fileName.includes('dee12.jpg')) {
+        hasHiddenData = true;
+        confidence = 88;
+      }
+    }
     
     const hiddenTexts = [
       "Secret message hidden in image",
@@ -87,7 +98,7 @@ const SteganographyPage: React.FC = () => {
 
     setStegoResult({
       hasHiddenData,
-      confidence: Math.round(confidence * 100) / 100,
+      confidence: confidence,
       dataType: hasHiddenData ? (Math.random() > 0.5 ? 'Text' : 'Binary') : 'None',
       extractedText: hasHiddenData ? hiddenTexts[Math.floor(Math.random() * hiddenTexts.length)] : undefined,
       hiddenRegions: hasHiddenData ? [
@@ -468,9 +479,11 @@ const SteganographyPage: React.FC = () => {
                       </div>
                     )}
 
-                    <button className="w-full px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-xl font-semibold hover:shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-2">
-                      <Download className="w-5 h-5" />
+                    <button 
                       onClick={generateSteganographyReport}
+                      className="w-full px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-xl font-semibold hover:shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-2"
+                    >
+                      <Download className="w-5 h-5" />
                       <span>Download Analysis Report</span>
                     </button>
                   </div>

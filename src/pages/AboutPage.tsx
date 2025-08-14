@@ -7,7 +7,6 @@ const AboutPage: React.FC = () => {
     {
       name: "Tharun Kumar C",
       role: "Lead AI Engineer",
-      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop&crop=face",
       bio: "Expert in deep learning and neural networks with focus on computer vision and deepfake detection algorithms.",
       skills: ["Machine Learning", "Computer Vision", "Python", "TensorFlow"],
       social: {
@@ -19,7 +18,6 @@ const AboutPage: React.FC = () => {
     {
       name: "Dharani K",
       role: "Full Stack Developer",
-      image: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=300&h=300&fit=crop&crop=face",
       bio: "Passionate about creating intuitive user interfaces and building scalable web applications with modern technologies.",
       skills: ["React", "Node.js", "UI/UX Design", "Cloud Architecture"],
       social: {
@@ -31,7 +29,6 @@ const AboutPage: React.FC = () => {
     {
       name: "Thanushrie Sathishkumar",
       role: "Data Scientist",
-      image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=300&h=300&fit=crop&crop=face",
       bio: "Specializes in steganography analysis and statistical pattern recognition with expertise in digital forensics.",
       skills: ["Data Analysis", "Steganography", "Python", "Statistical Modeling"],
       social: {
@@ -143,7 +140,8 @@ const AboutPage: React.FC = () => {
             </p>
           </div>
 
-          <div className="grid lg:grid-cols-3 gap-8">
+          <div className="bg-white/5 backdrop-blur-md rounded-3xl border border-white/10 p-12">
+            <div className="grid md:grid-cols-3 gap-8">
             {teamMembers.map((member, index) => (
               <motion.div
                 key={index}
@@ -151,21 +149,16 @@ const AboutPage: React.FC = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
                 viewport={{ once: true }}
-                className="group"
+                className="text-center"
               >
-                <div className="bg-white/5 backdrop-blur-md rounded-3xl border border-white/10 p-8 hover:bg-white/10 hover:border-white/20 transition-all duration-300 hover:-translate-y-2">
-                  <div className="text-center mb-6">
-                    <div className="relative inline-block mb-6">
-                      <img
-                        src={member.image}
-                        alt={member.name}
-                        className="w-32 h-32 rounded-full object-cover border-4 border-white/20 group-hover:border-purple-400/50 transition-all duration-300 group-hover:scale-110"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-cyan-500/20 rounded-full group-hover:opacity-0 transition-opacity duration-300" />
-                    </div>
+                <div className="mb-6">
+                  <div className="w-24 h-24 mx-auto mb-4 bg-gradient-to-br from-purple-500 to-cyan-500 rounded-full flex items-center justify-center">
+                    <span className="text-2xl font-bold text-white">
+                      {member.name.split(' ').map(n => n[0]).join('')}
+                    </span>
+                  </div>
                     <h3 className="text-2xl font-bold text-white mb-2">{member.name}</h3>
                     <p className="text-purple-400 font-semibold mb-4">{member.role}</p>
-                  </div>
 
                   <p className="text-gray-300 text-sm leading-relaxed mb-6">
                     {member.bio}
@@ -208,6 +201,25 @@ const AboutPage: React.FC = () => {
                 </div>
               </motion.div>
             ))}
+            </div>
+            
+            {/* Student Project Footer */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              viewport={{ once: true }}
+              className="mt-12 pt-8 border-t border-white/10 text-center"
+            >
+              <div className="bg-gradient-to-r from-purple-500/10 to-cyan-500/10 rounded-2xl p-6">
+                <h4 className="text-lg font-bold text-white mb-2">Student Project</h4>
+                <p className="text-gray-300 text-sm">
+                  This is a student project created by <span className="text-purple-400 font-semibold">Tharun Kumar C</span>, 
+                  <span className="text-cyan-400 font-semibold"> Dharani K</span>, and 
+                  <span className="text-pink-400 font-semibold"> Thanushrie Sathishkumar</span>
+                </p>
+              </div>
+            </motion.div>
           </div>
         </motion.div>
 

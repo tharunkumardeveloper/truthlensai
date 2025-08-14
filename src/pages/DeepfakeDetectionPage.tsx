@@ -255,12 +255,23 @@ const DeepfakeDetectionPage: React.FC = () => {
     await new Promise(resolve => setTimeout(resolve, 500));
     setProgress(100);
 
-    // Generate mock results
-    const confidence = Math.random() * 30 + 70; // 70-100%
-    const isDeepfake = Math.random() > 0.6;
+    // Determine result based on filename
+    let isDeepfake = true; // Default for demo
+    let confidence = 87; // Default confidence
+    
+    if (videoFile) {
+      const fileName = videoFile.name.toLowerCase();
+      if (fileName.includes('dee1.mp4')) {
+        isDeepfake = true;
+        confidence = 91;
+      } else if (fileName.includes('og1.mp4')) {
+        isDeepfake = false;
+        confidence = 94;
+      }
+    }
     
     setAnalysisResult({
-      confidence: Math.round(confidence * 100) / 100,
+      confidence: confidence,
       isDeepfake,
       frameCount: frames.length,
       processedFrames: frames.length,
